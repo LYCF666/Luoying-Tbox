@@ -52,6 +52,7 @@
 
 - 官网：[lycf.club](https://lycf.club)
 - 社区：[bbs.lycf.top](https://bbs.lycf.top)
+- 加入我们：[QQ群](https://qm.qq.com/q/89P4PR1Svu)
 
 ## License
 
