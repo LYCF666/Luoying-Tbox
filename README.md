@@ -1,94 +1,58 @@
 # 落樱匣
 
-<div align="center">
-  <img src="assets/qpp.png" width="100" height="100" alt="落樱匣" style="border-radius: 24px;">
-  
-  **一个温柔的小匣子，装满你需要的实用工具**
-  
-  [下载 APK](#下载) · [官方网站](https://lycf.club) · [落樱社区](https://bbs.lycf.top)
-</div>
+> 一个安静的工具箱，装着日常会用到的那些小工具。
 
-## 简介
+落樱匣是一款 Android 实用工具箱应用，集成了文本处理、编码转换、图片处理、计算工具等多种实用小工具，给手机减负，一个 APP 就够了。
 
-落樱匣是一款集成了多种实用工具的 Android 应用，提供图片处理、文本转换、编码解码、计算工具等丰富功能，让你的手机成为一个万能工具箱。
+## 下载
+
+前往 [Releases](../../releases) 页面下载最新版 APK。
 
 ## 功能特性
 
-- **多主题切换** - 支持多种主题色和动态取色，随心搭配属于你的风格
-- **丰富工具** - 12+ 实用工具，涵盖文本、编码、图片、计算等分类
-- **社区交流** - 内置落樱社区（Discourse），用户互助交流
-- **极致体验** - Material 3 设计语言，流畅交互，开屏每日一图
-- **版本更新** - 支持自动检测更新和强制更新
-- **用户系统** - 注册登录、VIP 会员、密码找回
+- **高效集成** — 多种实用工具集于一身，涵盖文本、编码、图片、计算等分类
+- **极致精简** — 简明纯粹的界面，没有多余的信息干扰
+- **美好设计** — 跟随 Material Design 潮流，多套主题配色，支持深色模式和动态取色
+- **社区驱动** — 内置落樱社区，用户反馈持续改进
 
-## 内置工具
+## 工具列表
 
-| 分类 | 工具 |
-|------|------|
-| 文本 | 字数统计 |
-| 编码 | Base64、URL 编码、JSON 格式化、二维码生成、JWT 解码器 |
-| 图片 | 图片压缩 |
-| 计算 | 时间戳转换、单位换算、进制转换、密码生成器、颜色转换器 |
+| 工具 | 分类 | 说明 |
+|------|------|------|
+| 字数统计 | 文本 | 统计字符数、词数、行数 |
+| Base64 | 编码 | Base64 编码/解码 |
+| 时间戳转换 | 计算 | 时间戳与日期互转 |
+| URL 编码 | 编码 | URL 编码/解码 |
+| 二维码生成 | 编码 | 生成二维码图片 |
+| 图片压缩 | 图片 | 压缩图片体积 |
+| JSON 格式化 | 编码 | JSON 格式化与压缩 |
+| 单位换算 | 计算 | 长度、重量、温度等换算 |
+| 密码生成器 | 计算 | 随机生成安全密码 |
+| 颜色转换器 | 计算 | RGB/HEX/HSL/HSV 互转 |
+| JWT 解码器 | 编码 | 解码 JWT Token |
+| 进制转换 | 计算 | 二/八/十/十六进制互转 |
+| 图片文字识别 | 图片 | OCR 识别图片中的文字 |
+| 正则表达式测试 | 文本 | 实时匹配高亮正则结果 |
+| UUID 生成器 | 编码 | 批量生成 UUID |
+| 哈希计算器 | 编码 | MD5/SHA1/SHA256 计算 |
+| 文本差异对比 | 文本 | 逐行对比两段文本差异 |
 
 ## 截图
 
-<div align="center">
-  <img src="website/logo.png" width="200" alt="Logo">
-</div>
+<img src="website/shot1.jpg" width="280" alt="首页" /> <img src="website/shot2.jpg" width="280" alt="社区" /> <img src="website/shot3.jpg" width="280" alt="我的" />
 
 ## 技术栈
 
 - **前端**：Flutter (Dart)
-- **后端**：Next.js 16 + TypeScript + Prisma
+- **后端**：Node.js / Next.js
 - **数据库**：MySQL
 - **社区**：Discourse
-- **支付**：易支付
-
-## 项目结构
-
-```
-lib/
-├── config/         # 配置文件（API、工具、主题）
-├── models/         # 数据模型
-├── pages/          # 页面
-│   ├── auth/       # 登录、注册、重置密码
-│   ├── tools/      # 各工具页面
-│   └── ...
-├── services/       # 服务层（API、认证、VIP等）
-├── theme/          # 主题系统
-└── widgets/        # 公共组件
-```
-
-## 编译
-
-```bash
-# 安装依赖
-flutter pub get
-
-# 运行
-flutter run
-
-# 打包 APK
-flutter build apk --release
-```
-
-## 下载
-
-- **APK 下载**：前往 [发布页面](../../releases) 下载最新版本
-- **系统要求**：Android 5.0+
-- **官网**：[https://lycf.club](https://lycf.club)
 
 ## 相关链接
 
-- [落樱社区](https://bbs.lycf.top) - 用户交流、问题反馈
-- [官方网站](https://lycf.club) - 了解更多
+- 官网：[lycf.club](https://lycf.club)
+- 社区：[bbs.lycf.top](https://bbs.lycf.top)
 
-## 开源协议
+## License
 
-本项目采用 MIT 协议，详见 [LICENSE](LICENSE)。
-
----
-
-<div align="center">
-  © 2026 落樱匣 · 保留所有权利
-</div>
+本项目不开源，仅供下载使用。
