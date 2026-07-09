@@ -1,0 +1,22 @@
+# 语言占比配置 - 模拟实际项目技术栈
+# Dart (Flutter APP) ~ 55%
+*.dart linguist-language=Dart
+# TypeScript (Next.js 后端) ~ 30%
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+# HTML/CSS (官网) ~ 10%
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+# YAML 配置 ~ 5%
+*.yaml linguist-language=YAML
+*.yml linguist-language=YAML
+# Kotlin (Android 原生配置)
+*.kt linguist-language=Kotlin
+*.kts linguist-language=Kotlin
+
+# 忽略图片文件不计入语言统计
+*.png linguist-vendored
+*.jpg linguist-vendored
+*.jpeg linguist-vendored
+*.svg linguist-vendored
+*.ico linguist-vendored
