@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>落樱匣 - 实用工具集合</title>
+<meta name="description" content="落樱匣是一款 Android 实用工具箱应用，集成字数统计、Base64、JSON 格式化、二维码生成等多种工具。">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafafa;
+  --bg-card:#fff;
+  --text:#1a1a1a;
+  --text-2:#666;
+  --text-3:#999;
+  --line:#eaeaea;
+  --accent:#e85a8c;
+  --accent-bg:rgba(232,90,140,.06);
+  --radius:16px;
+  --max-w:1160px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0d0d0d;
+    --bg-card:#181818;
+    --text:#f0f0f0;
+    --text-2:#aaa;
+    --text-3:#666;
+    --line:#262626;
+    --accent:#f472b6;
+    --accent-bg:rgba(244,114,182,.08);
+  }
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 24px}
+
+/* ====== 滚动揭示基类 ====== */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:.08s}
+.reveal-d2{transition-delay:.16s}
+.reveal-d3{transition-delay:.24s}
+.reveal-d4{transition-delay:.32s}
+.reveal-d5{transition-delay:.4s}
+.reveal-d6{transition-delay:.48s}
+
+/* ====== nav ====== */
+nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,250,250,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s,background .3s;
+}
+nav.scrolled{border-color:var(--line)}
+@media(prefers-color-scheme:dark){nav{background:rgba(13,13,13,.85)}}
+nav .inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:var(--max-w);margin:0 auto;padding:0 24px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.brand img{width:26px;height:26px;border-radius:6px;transition:transform .4s var(--ease)}
+.brand:hover img{transform:rotate(-8deg)}
+.nav-links{display:flex;gap:28px;font-size:14px;color:var(--text-2)}
+.nav-links a{position:relative;transition:color .2s}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--accent);border-radius:2px;transition:width .3s var(--ease)}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{width:100%}
+.nav-btn{font-size:14px;font-weight:500;padding:7px 18px;border-radius:8px;background:var(--accent);color:#fff;transition:opacity .2s,transform .2s}
+.nav-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ====== hero ====== */
+.hero{padding:88px 0 48px;text-align:center;position:relative}
+.hero::before{
+  content:"";position:absolute;left:50%;top:40%;width:600px;height:600px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,var(--accent-bg) 0%,transparent 65%);
+  pointer-events:none;z-index:-1;
+}
+.hero h1{font-size:48px;font-weight:700;letter-spacing:-1.5px;line-height:1.15}
+.hero .sub{font-size:18px;color:var(--text-2);margin-top:16px;max-width:560px;margin-left:auto;margin-right:auto}
+.hero .cta-row{display:flex;gap:12px;justify-content:center;margin-top:36px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:13px 30px;border-radius:10px;font-size:15px;font-weight:500;transition:all .2s var(--ease);border:1px solid transparent}
+.btn-accent{background:var(--accent);color:#fff;box-shadow:0 6px 20px rgba(232,90,140,.22)}
+.btn-accent:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(232,90,140,.32)}
+.btn-outline{background:transparent;border-color:var(--line);color:var(--text)}
+.btn-outline:hover{border-color:var(--text-3);transform:translateY(-2px)}
+.hero .meta{margin-top:18px;font-size:13px;color:var(--text-3)}
+
+/* hero 入场动画 */
+.hero-anim{opacity:0;transform:translateY(20px);animation:heroIn .8s var(--ease) forwards}
+.hero-anim.d1{animation-delay:.05s}
+.hero-anim.d2{animation-delay:.18s}
+.hero-anim.d3{animation-delay:.3s}
+.hero-anim.d4{animation-delay:.42s}
+.hero-anim.d5{animation-delay:.6s}
+.hero-anim.d6{animation-delay:.78s}
+@keyframes heroIn{to{opacity:1;transform:none}}
+
+/* hero 截图 - PC 三张扇形 */
+.hero-shots{margin-top:56px;display:flex;justify-content:center;align-items:flex-end;gap:0;position:relative}
+.hero-shots img{
+  width:240px;border-radius:20px;border:1px solid var(--line);
+  box-shadow:0 24px 64px rgba(0,0,0,.1);
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease);
+}
+.hero-shots img:nth-child(1){transform:translateX(50px) rotate(-6deg) translateY(20px);z-index:1}
+.hero-shots img:nth-child(2){z-index:3;position:relative}
+.hero-shots img:nth-child(3){transform:translateX(-50px) rotate(6deg) translateY(20px);z-index:1}
+.hero-shots img:nth-child(1):hover{transform:translateX(30px) rotate(-3deg) translateY(10px);box-shadow:0 32px 72px rgba(232,90,140,.18)}
+.hero-shots img:nth-child(2):hover{transform:translateY(-6px);box-shadow:0 32px 72px rgba(232,90,140,.18)}
+.hero-shots img:nth-child(3):hover{transform:translateX(-30px) rotate(3deg) translateY(10px);box-shadow:0 32px 72px rgba(232,90,140,.18)}
+@media(prefers-color-scheme:dark){.hero-shots img{box-shadow:0 24px 64px rgba(0,0,0,.4)}}
+
+/* ====== stats bar ====== */
+.stats{
+  display:flex;justify-content:center;gap:56px;
+  margin-top:56px;padding:28px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.stat{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.stat .ic{
+  width:36px;height:36px;border-radius:10px;background:var(--accent-bg);
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  transition:transform .3s var(--ease);
+}
+.stat:hover .ic{transform:translateY(-3px) scale(1.05)}
+.stat .lbl{font-size:15px;font-weight:600}
+.stat .desc{font-size:12px;color:var(--text-3)}
+
+/* ====== section ====== */
+.section{padding:88px 0;border-top:1px solid var(--line)}
+.section-head{text-align:center;margin-bottom:56px}
+.section-head h2{font-size:32px;font-weight:700;letter-spacing:-.3px}
+.section-head p{color:var(--text-2);font-size:15px;margin-top:10px}
+.section-tag{
+  display:inline-block;font-size:12px;font-weight:600;letter-spacing:1px;
+  color:var(--accent);background:var(--accent-bg);
+  padding:4px 12px;border-radius:20px;margin-bottom:14px;text-transform:uppercase;
+}
+
+/* ====== features ====== */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{
+  background:var(--bg-card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:40px 32px;text-align:center;
+  transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease);
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,var(--accent-bg),transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 16px 40px rgba(232,90,140,.1)}
+.feature-card:hover::before{opacity:1}
+.feature-card>*{position:relative;z-index:1}
+.feature-icon{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 20px;
+  background:var(--accent-bg);display:flex;align-items:center;justify-content:center;
+  transition:transform .3s var(--ease);
+}
+.feature-card:hover .feature-icon{transform:scale(1.08) rotate(-4deg)}
+.feature-icon svg{color:var(--accent)}
+.feature-card h3{font-size:19px;font-weight:600;margin-bottom:10px}
+.feature-card p{font-size:14px;color:var(--text-2);line-height:1.75}
+
+/* ====== tools - PC 6列 ====== */
+.tools-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tool{
+  background:var(--bg-card);padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;
+  transition:background .2s,transform .2s var(--ease);
+  opacity:0;transform:translateY(16px);
+}
+.tool.in{opacity:1;transform:none;transition:opacity .5s var(--ease),transform .5s var(--ease),background .2s}
+.tool:hover{background:var(--accent-bg);transform:translateY(-3px)}
+.tool svg{color:var(--accent);flex-shrink:0;transition:transform .3s var(--ease)}
+.tool:hover svg{transform:scale(1.15)}
+.tool .name{font-size:14px;font-weight:500}
+.tool .cat{font-size:11px;color:var(--text-3)}
+.tools-more{text-align:center;margin-top:32px;font-size:14px;color:var(--text-3)}
+.tools-more strong{color:var(--accent)}
+
+/* ====== showcase - PC 错落 ====== */
+.showcase-shots{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+.showcase-shots img{
+  width:280px;border-radius:16px;border:1px solid var(--line);
+  box-shadow:0 12px 36px rgba(0,0,0,.08);
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease);
+}
+.showcase-shots img:nth-child(1){transform:translateY(0)}
+.showcase-shots img:nth-child(2){transform:translateY(32px)}
+.showcase-shots img:nth-child(3){transform:translateY(0)}
+.showcase-shots img:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 48px rgba(232,90,140,.14)}
+@media(prefers-color-scheme:dark){.showcase-shots img{box-shadow:0 12px 36px rgba(0,0,0,.3)}}
+
+/* ====== split ====== */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split-text h2{font-size:28px;font-weight:700;letter-spacing:-.3px;margin-bottom:16px}
+.split-text p{color:var(--text-2);font-size:15px;margin-bottom:24px}
+.split-text ul{list-style:none}
+.split-text li{padding:10px 0;font-size:14px;color:var(--text-2);display:flex;gap:10px;align-items:flex-start}
+.split-text li svg{color:var(--accent);flex-shrink:0;margin-top:4px}
+.split-card{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.split-card .row{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--line);transition:transform .25s var(--ease)}
+.split-card .row:last-child{border-bottom:none}
+.split-card .row:hover{transform:translateX(4px)}
+.split-card .row .ic{width:40px;height:40px;border-radius:10px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s var(--ease)}
+.split-card .row:hover .ic{transform:scale(1.1)}
+.split-card .row .ic svg{color:var(--accent)}
+.split-card .row .lbl{font-size:14px;font-weight:500}
+.split-card .row .desc{font-size:12px;color:var(--text-3)}
+
+/* ====== download ====== */
+.dl-box{
+  text-align:center;padding:64px 24px;background:var(--bg-card);
+  border:1px solid var(--line);border-radius:24px;position:relative;overflow:hidden;
+}
+.dl-box::before{
+  content:"";position:absolute;left:50%;top:0;width:140%;height:200%;
+  transform:translateX(-50%);background:radial-gradient(ellipse at center top,var(--accent-bg),transparent 55%);
+  pointer-events:none;
+}
+.dl-box>*{position:relative;z-index:1}
+.dl-box h2{font-size:30px;font-weight:700}
+.dl-box p{color:var(--text-2);margin-top:10px;font-size:15px}
+.dl-btns{display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+.dl-info{margin-top:16px;font-size:13px;color:var(--text-3)}
+
+/* ====== footer ====== */
+footer{border-top:1px solid var(--line);padding:44px 0}
+footer .inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+footer .links{display:flex;gap:20px;font-size:14px;color:var(--text-2)}
+footer .links a{transition:color .2s}
+footer .links a:hover{color:var(--accent)}
+footer .copy{font-size:13px;color:var(--text-3)}
+
+/* ====== tablet ====== */
+@media(max-width:1024px){
+  .tools-grid{grid-template-columns:repeat(4,1fr)}
+  .hero-shots img{width:200px}
+  .hero-shots img:nth-child(1){transform:translateX(36px) rotate(-5deg) translateY(16px)}
+  .hero-shots img:nth-child(3){transform:translateX(-36px) rotate(5deg) translateY(16px)}
+  .hero h1{font-size:40px}
+  .stats{gap:36px}
+}
+
+/* ====== mobile ====== */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hero{padding:56px 0 32px}
+  .hero h1{font-size:32px}
+  .hero .sub{font-size:16px}
+  .hero-shots{flex-direction:column;gap:16px}
+  .hero-shots img{width:220px}
+  .hero-shots img:nth-child(1),
+  .hero-shots img:nth-child(3){transform:none}
+  .stats{gap:20px;flex-wrap:wrap}
+  .stat .lbl{font-size:13px}
+  .features{grid-template-columns:1fr;gap:16px}
+  .tools-grid{grid-template-columns:repeat(2,1fr)}
+  .split{grid-template-columns:1fr;gap:32px}
+  .section{padding:64px 0}
+  .showcase-shots img{width:220px}
+  .showcase-shots img:nth-child(2){transform:none}
+  .feature-card{padding:32px 24px}
+  .section-head h2{font-size:26px}
+  .split-text h2{font-size:24px}
+  .dl-box h2{font-size:24px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+  .tool{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="inner">
+    <div class="brand"><img src="logo.png" alt="">落樱匣</div>
+    <div class="nav-links">
+      <a href="#features">特性</a>
+      <a href="#tools">工具</a>
+      <a href="#showcase">截图</a>
+      <a href="#community">社区</a>
+      <a href="#download">下载</a>
+    </div>
+    <a href="#download" class="nav-btn">下载</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <h1 class="hero-anim d1">落樱匣</h1>
+    <p class="sub hero-anim d2">一个安静的工具箱，装着日常会用到的那些小工具。给手机减负，一个 APP 就够了。</p>
+    <div class="cta-row hero-anim d3">
+      <a href="#download" class="btn btn-accent">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+        立即下载
+      </a>
+      <a href="#features" class="btn btn-outline">了解更多</a>
+    </div>
+    <p class="meta hero-anim d4">v1.0.0</p>
+
+    <!-- 三张截图扇形展开 -->
+    <div class="hero-shots hero-anim d5">
+      <img src="shot2.jpg" alt="社区">
+      <img src="shot1.jpg" alt="首页">
+      <img src="shot3.jpg" alt="我的">
+    </div>
+
+    <!-- 特色数据 -->
+    <div class="stats hero-anim d6">
+      <div class="stat">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="lbl">社区驱动</div>
+        <div class="desc">用户反馈持续改进</div>
+      </div>
+      <div class="stat">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg></div>
+        <div class="lbl">离线可用</div>
+        <div class="desc">大部分工具无需联网</div>
+      </div>
+      <div class="stat">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22a10 10 0 010-20"/></svg></div>
+        <div class="lbl">多套主题</div>
+        <div class="desc">深色模式与动态取色</div>
+      </div>
+      <div class="stat">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div>
+        <div class="lbl">持续更新</div>
+        <div class="desc">工具不断新增中</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 特性 -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-tag">核心特性</span>
+      <h2>为什么选择落樱匣</h2>
+      <p>少即是多，把每一件小事做到位</p>
+    </div>
+    <div class="features">
+      <div class="feature-card reveal reveal-d1">
+        <div class="feature-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+        </div>
+        <h3>高效集成</h3>
+        <p>落樱匣提供了多种实用工具，涵盖文本、编码、图片、计算等分类，满足日常需求。不再需要安装一堆不常用的 APP，给设备减负。</p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="feature-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>极致精简</h3>
+        <p>轻量的体积，简明纯粹的界面，没有后台、推送与唤醒，没有任何多余的信息干扰。收藏功能让你在众多工具中快速找到常用的。</p>
+      </div>
+      <div class="feature-card reveal reveal-d3">
+        <div class="feature-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+        </div>
+        <h3>美好设计</h3>
+        <p>坚守简明纯粹的实用主义美学，跟随 Material Design 潮流。多套主题配色，支持深色模式和动态取色，在细节上执着到像素级。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 工具展示 -->
+<section class="section" id="tools">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-tag">工具一览</span>
+      <h2>工具展示</h2>
+      <p>为您提供高效的小工具，持续增加中</p>
+    </div>
+    <div class="tools-grid" id="toolsGrid">
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg><div class="name">字数统计</div><div class="cat">文本</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg><div class="name">Base64</div><div class="cat">编码</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div class="name">时间戳</div><div class="cat">计算</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><div class="name">URL 编码</div><div class="cat">编码</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><div class="name">二维码</div><div class="cat">编码 · VIP</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><div class="name">图片压缩</div><div class="cat">图片 · VIP</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z M7 7h10 M7 12h10 M7 17h6"/></svg><div class="name">JSON 格式化</div><div class="cat">编码</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg><div class="name">单位换算</div><div class="cat">计算</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><div class="name">密码生成</div><div class="cat">计算</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22a10 10 0 010-20"/></svg><div class="name">颜色转换</div><div class="cat">计算</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"/></svg><div class="name">JWT 解码</div><div class="cat">编码</div></div>
+      <div class="tool"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z"/></svg><div class="name">进制转换</div><div class="cat">计算</div></div>
+    </div>
+    <p class="tools-more reveal">还有更多工具 <strong>持续增加中</strong></p>
+  </div>
+</section>
+
+<!-- 截图展示 -->
+<section class="section" id="showcase">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-tag">界面预览</span>
+      <h2>应用截图</h2>
+      <p>简明纯粹的界面，所见即所得</p>
+    </div>
+    <div class="showcase-shots">
+      <img class="reveal" src="shot1.jpg" alt="首页">
+      <img class="reveal reveal-d2" src="shot2.jpg" alt="社区">
+      <img class="reveal reveal-d3" src="shot3.jpg" alt="我的">
+    </div>
+  </div>
+</section>
+
+<!-- 社区 -->
+<section class="section" id="community">
+  <div class="container">
+    <div class="split">
+      <div class="split-text reveal">
+        <span class="section-tag">社区</span>
+        <h2>社区，不止于工具</h2>
+        <p>内置落樱社区，基于 Discourse 搭建。浏览帖子、参与讨论、反馈问题，都在 APP 内完成。</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>原生 UI 浏览最新帖子，按分类筛选</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>一键进入完整社区，支持发帖回复</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>不用额外安装社区 APP</li>
+        </ul>
+      </div>
+      <div class="split-card reveal reveal-d2">
+        <div class="row">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H3v-9A8.5 8.5 0 0 1 11.5 2h0A8.5 8.5 0 0 1 20 10.5"/></svg></div>
+          <div><div class="lbl">落樱社区</div><div class="desc">bbs.lycf.top</div></div>
+        </div>
+        <div class="row">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div><div class="lbl">分类讨论</div><div class="desc">刷机、资源分享、反馈</div></div>
+        </div>
+        <div class="row">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <div><div class="lbl">发帖交流</div><div class="desc">APP 内 WebView 直接操作</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 下载 -->
+<section class="section" id="download">
+  <div class="container">
+    <div class="dl-box reveal">
+      <h2>立即下载</h2>
+      <p>免费使用，持续更新</p>
+      <div class="dl-btns">
+        <a href="#" class="btn btn-accent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+          下载 APK
+        </a>
+        <a href="https://bbs.lycf.top" target="_blank" class="btn btn-outline">加入社区</a>
+      </div>
+      <p class="dl-info">v1.0.0</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="inner container">
+    <div class="links">
+      <a href="https://lycf.club" target="_blank">官网</a>
+      <a href="https://bbs.lycf.top" target="_blank">社区</a>
+      <a href="https://github.com" target="_blank">GitHub</a>
+    </div>
+    <div class="copy">© 2026 落樱匣</div>
+  </div>
+</footer>
+
+<script>
+// 导航栏滚动状态
+(function(){
+  const nav=document.getElementById('nav');
+  const onScroll=()=>nav.classList.toggle('scrolled',window.scrollY>8);
+  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+})();
+
+// 通用滚动揭示
+(function(){
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+    });
+  },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+
+// 工具格子逐个揭示（带交错延迟）
+(function(){
+  const grid=document.getElementById('toolsGrid');
+  if(!grid)return;
+  const items=grid.querySelectorAll('.tool');
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx=Array.from(items).indexOf(e.target);
+        e.target.style.transitionDelay=(idx*45)+'ms';
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+  items.forEach(t=>io.observe(t));
+})();
+</script>
+
+</body>
+</html>
