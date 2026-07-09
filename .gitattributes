@@ -1,4 +1,4 @@
-# 语言占比配置 - 模拟实际项目技术栈
+
 # Dart (Flutter APP) ~ 55%
 *.dart linguist-language=Dart
 # TypeScript (Next.js 后端) ~ 30%
